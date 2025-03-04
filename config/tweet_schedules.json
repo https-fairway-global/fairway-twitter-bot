@@ -1,0 +1,9 @@
+[
+  {
+    "id": "default",
+    "cronExpression": "0 */2 * * *",
+    "topicPreference": "random",
+    "active": true,
+    "lastRun": "2025-03-04T18:00:00.055Z"
+  }
+]
