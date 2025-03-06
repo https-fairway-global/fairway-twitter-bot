@@ -2,9 +2,10 @@
 
 A sophisticated Twitter bot designed to promote Fairway's blockchain identity verification solutions on Cardano and other chains. Leveraging advanced AI, it delivers engaging content about decentralized identity, compliance, Web3 hiring, and blockchain technology.
 
-## Features
+## Key Features
 
 - **Intelligent Content Strategy**: Creates engaging content focused on Cardano, blockchain identity, compliance, and related topics
+- **Automated Network Building**: Automatically follows relevant accounts in your industry based on customizable criteria
 - **Smart Engagement System**: Automatically finds and engages with relevant conversations using prioritized hashtags and keywords
 - **Strategic Following**: Discovers and follows relevant accounts based on customizable criteria including follower count, bio keywords, and activity levels
 - **Balanced Promotion**: Maintains a 50/50 split between promotional and non-promotional content
@@ -12,6 +13,21 @@ A sophisticated Twitter bot designed to promote Fairway's blockchain identity ve
 - **API Efficiency**: Automatically respects Twitter API rate limits for free tier users
 - **Dashboard**: Real-time analytics dashboard to monitor performance and activity
 - **Content Customization**: Weighted topic selection to emphasize priority topics
+- **Optimized Performance**: Streamlined dependencies and improved startup reliability
+- **Robust Error Handling**: Graceful handling of Twitter API rate limits and other potential errors
+
+## Auto-Follow Functionality
+
+The bot includes a powerful auto-follow system that helps grow your Twitter network by finding and following accounts relevant to your industry. This feature:
+
+- Automatically discovers accounts based on keywords you define
+- Applies sophisticated filtering based on follower counts, following counts, verification status, etc.
+- Respects daily follow limits to avoid triggering Twitter's anti-spam measures
+- Targets accounts with specific keywords in their bio
+- Logs all auto-follow activity for your review
+- Can be easily enabled/disabled via environment variables
+
+To enable auto-follow, make sure `TWITTER_USER_ID` is properly set and `TWITTER_AUTO_FOLLOW_ENABLED` is set to `true` in your `.env` file.
 
 ## Content Strategy
 
@@ -83,14 +99,24 @@ To customize the content strategy:
 
 1. Modify the prompts in `src/constants/topic-prompts.constant.ts`
 2. Adjust topic weights in `src/modules/manage-tweet/manage-tweet.service.ts`
-3. Update hashtags and keywords in `src/modules/user-interactions/user-interactions.service.ts`
+3. Update hashtags and keywords in `src/constants/hashtags.constant.ts`
 
 ## Troubleshooting
 
 If you encounter issues:
-- Check the application logs for specific error messages
+- Check the application logs in the `logs/` directory for detailed error messages
 - Ensure all required API keys are correctly set in your `.env` file
 - Verify your Twitter API credentials have the appropriate permissions
+- Use the debugging scripts (`verify-env.js`, `test-autofollow.js`) to troubleshoot specific features
+- Check that your `TWITTER_USER_ID` is correctly set in the `.env` file
+
+## Debugging Tools
+
+The application includes several utility scripts to help with debugging:
+- `verify-env.js` - Verifies that all required environment variables are set correctly
+- `test-autofollow.js` - Tests the auto-follow functionality without affecting the main application
+- `debug-app.js` - Provides detailed logs during application startup
+- `run-app.js` - Monitors the application startup process with better error reporting
 
 ## Contributing
 
@@ -112,7 +138,7 @@ If you have any questions, suggestions, or feedback, feel free to reach out to m
 - `TWITTER_API_SECRET`: Your Twitter API secret
 - `TWITTER_ACCESS_TOKEN`: Your Twitter access token
 - `TWITTER_ACCESS_SECRET`: Your Twitter access token secret
-- `TWITTER_USER_ID`: Your Twitter user ID for API v2
+- `TWITTER_USER_ID`: Your Twitter user ID for API v2 (REQUIRED for auto-follow functionality)
 
 ### Auto-Follow Configuration
 
@@ -129,3 +155,12 @@ If you have any questions, suggestions, or feedback, feel free to reach out to m
 - `TWITTER_FOLLOW_MUST_HAVE_BIO`: Set to 'true' to only follow accounts with bios (default: true)
 - `TWITTER_FOLLOW_MIN_ACCOUNT_AGE`: Minimum account age in days (default: 30)
 - `TWITTER_FOLLOW_BIO_KEYWORDS`: Comma-separated list of keywords that must appear in user bios (optional)
+
+## Optimizing Performance
+
+If you encounter sluggish performance or high memory usage:
+
+1. **Clean dependencies**: Periodically run `npm prune` to remove unused dependencies
+2. **Restart services**: Restart the application if you notice memory leaks or decreased performance over time
+3. **Check logs**: Monitor the log files in the `logs/` directory for any recurring errors or warnings
+4. **Adjust polling frequencies**: If needed, modify the cron schedules in the services to reduce API calls
