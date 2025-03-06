@@ -8,6 +8,6 @@ import { EnvConfigModule } from '../envConfig/envConfig.module';
   imports: [ApiIntegrationsModule, EnvConfigModule],
   controllers: [AnalyticsController],
   providers: [AnalyticsService],
-  exports: [AnalyticsService],
+  exports: [AnalyticsService]
 })
 export class AnalyticsModule {} 

@@ -46,6 +46,7 @@ export class AnalyticsService {
     
     this.dataFilePath = path.join(dataDir, 'tweet_metrics.json');
     this.loadTweetsData();
+    this.logger.log('AnalyticsService initialized');
   }
 
   private loadTweetsData() {
@@ -73,21 +74,49 @@ export class AnalyticsService {
     }
   }
 
-  @Cron(CronExpression.EVERY_HOUR)
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async collectMetrics() {
     this.logger.log('Collecting tweet metrics...');
     
+    // Check if we've already collected metrics in the last 24 hours
+    const lastCollection = this._lastMetricsCollection || 0;
+    const now = Date.now();
+    const twentyFourHoursMs = 24 * 60 * 60 * 1000;
+    
+    if (now - lastCollection < twentyFourHoursMs) {
+      this.logger.log(`Skipping metrics collection - last collection was ${Math.round((now - lastCollection) / (60 * 60 * 1000))} hours ago`);
+      return;
+    }
+    
     try {
-      // Get user's recent tweets (last 24 hours)
+      // Get user's recent tweets with exponential backoff
+      await this._collectMetricsWithBackoff();
+      this._lastMetricsCollection = now;
+    } catch (error) {
+      this.logger.error(`Error collecting metrics: ${error.message}`);
+    }
+  }
+  
+  // New property to track last collection time
+  private _lastMetricsCollection: number = 0;
+  // Track backoff attempts
+  private _backoffAttempts: number = 0;
+  // Maximum backoff delay (5 minutes)
+  private readonly _maxBackoffDelayMs: number = 5 * 60 * 1000;
+  
+  // Helper method to implement exponential backoff
+  private async _collectMetricsWithBackoff(delay: number = 1000): Promise<void> {
+    try {
+      // Get user's recent tweets (last 7 days instead of 1 to reduce frequency)
       const twitterClientV2 = this.twitterApiService.getTwitterClientV2();
       const me = await twitterClientV2.me();
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
       
       const tweets = await twitterClientV2.userTimeline(me.data.id, {
-        start_time: yesterday.toISOString(),
+        start_time: sevenDaysAgo.toISOString(),
         "tweet.fields": ["created_at", "public_metrics", "text"],
-        max_results: 100,
+        max_results: 50, // Reduce from 100 to 50 to help with rate limits
       });
       
       if (!tweets.data?.data) {
@@ -95,6 +124,9 @@ export class AnalyticsService {
         return;
       }
       
+      this._backoffAttempts = 0; // Reset attempts on success
+      
+      let processedCount = 0;
       for (const tweet of tweets.data.data) {
         // Skip if we already have metrics for this tweet
         if (this.tweetsData.some(t => t.tweetId === tweet.id)) {
@@ -130,14 +162,48 @@ export class AnalyticsService {
           timestamp: tweet.created_at || new Date().toISOString(),
           engagement_rate: engagementRate,
         });
+        
+        processedCount++;
       }
       
       // Save the updated data
       this.saveTweetsData();
+      this.logger.log(`Successfully collected metrics for ${processedCount} new tweets`);
       
     } catch (error) {
-      this.logger.error(`Error collecting metrics: ${error.message}`);
+      // Check if this is a rate limit error
+      if (error.message.includes('429') || error.message.includes('rate limit') || error.message.includes('Too Many Requests')) {
+        this._backoffAttempts++;
+        
+        // Calculate backoff delay with exponential increase and jitter
+        const jitter = Math.random() * 0.3 + 0.85; // Random factor between 0.85 and 1.15
+        let backoffDelay = Math.min(delay * 2 * jitter, this._maxBackoffDelayMs);
+        
+        // If we've retried too many times, give up for now
+        if (this._backoffAttempts > 5) {
+          this.logger.warn(`Rate limit persists after ${this._backoffAttempts} attempts, giving up for now.`);
+          throw new Error(`Rate limit exceeded after ${this._backoffAttempts} attempts`);
+        }
+        
+        this.logger.log(`Rate limit encountered, backing off for ${Math.round(backoffDelay / 1000)} seconds (attempt ${this._backoffAttempts})`);
+        
+        // Wait for the backoff period then retry
+        await new Promise(resolve => setTimeout(resolve, backoffDelay));
+        return this._collectMetricsWithBackoff(backoffDelay);
+      }
+      
+      // If it's another error, just rethrow
+      throw error;
     }
+  }
+
+  /**
+   * Force collection of metrics with backoff, can be called manually via API
+   * @returns Promise that resolves when collection is complete
+   */
+  async forceCollectWithBackoff(): Promise<void> {
+    this.logger.log('Manually triggered metrics collection with backoff...');
+    return this._collectMetricsWithBackoff();
   }
 
   getPerformanceByTopic(): PerformanceByTopic[] {
@@ -219,5 +285,30 @@ export class AnalyticsService {
     }
     
     return result.sort((a, b) => b.engagementRate - a.engagementRate);
+  }
+
+  /**
+   * Collect metrics for specific data point (can be called manually)
+   * @param data The data to collect metrics for
+   */
+  collectMetricsForEvent(data: any): void {
+    try {
+      this.logger.log(`Collecting manual metrics: ${JSON.stringify(data)}`);
+      // Implementation would go here - for now just log
+    } catch (error) {
+      this.logger.error(`Error collecting manual metrics: ${error.message}`);
+    }
+  }
+  
+  /**
+   * Get current analytics data
+   */
+  getAnalytics(): any {
+    return {
+      tweets: this.tweetsData.length,
+      impressions: this.tweetsData.reduce((total, tweet) => total + tweet.impressions, 0),
+      engagement: this.tweetsData.reduce((total, tweet) => total + tweet.engagement_rate, 0),
+      followers: 0
+    };
   }
 } 

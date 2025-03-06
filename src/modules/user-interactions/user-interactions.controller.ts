@@ -1,19 +1,25 @@
 import { Controller, Get } from '@nestjs/common';
 import { UserInteractionsService } from './user-interactions.service';
 
-@Controller('user-interactions')
+@Controller('api/user-interactions')
 export class UserInteractionsController {
   constructor(private readonly userInteractionsService: UserInteractionsService) {}
 
   @Get('check-mentions')
-  async triggerMentionCheck() {
+  async checkMentions() {
     await this.userInteractionsService.checkAndRespondToMentions();
-    return { message: 'Mention check triggered successfully' };
+    return { 
+      success: true,
+      message: 'Mention check triggered successfully' 
+    };
   }
 
   @Get('check-dms')
-  async triggerDmCheck() {
+  async checkDirectMessages() {
     await this.userInteractionsService.checkAndProcessDirectMessages();
-    return { message: 'Direct message check triggered successfully' };
+    return { 
+      success: true,
+      message: 'Direct message check triggered successfully' 
+    };
   }
 } 

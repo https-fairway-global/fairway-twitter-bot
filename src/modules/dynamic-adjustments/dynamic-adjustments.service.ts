@@ -208,11 +208,16 @@ export class DynamicAdjustmentsService {
     return this.schedules;
   }
 
-  updateSchedule(id: string, updates: Partial<TweetSchedule>): TweetSchedule | null {
-    const index = this.schedules.findIndex(s => s.id === id);
+  getScheduleById(id: string): TweetSchedule | null {
+    const schedule = this.schedules.find(s => s.id === id);
+    return schedule || null;
+  }
+
+  updateSchedule(scheduleData: TweetSchedule): TweetSchedule | null {
+    const index = this.schedules.findIndex(s => s.id === scheduleData.id);
     if (index === -1) return null;
     
-    this.schedules[index] = { ...this.schedules[index], ...updates };
+    this.schedules[index] = { ...this.schedules[index], ...scheduleData };
     this.saveSchedules();
     
     // If schedule was updated, reinitialize the cron jobs
@@ -221,10 +226,11 @@ export class DynamicAdjustmentsService {
     return this.schedules[index];
   }
 
-  addSchedule(schedule: Omit<TweetSchedule, 'id'>): TweetSchedule {
+  createSchedule(scheduleData: Omit<TweetSchedule, 'id'>): TweetSchedule {
     const newSchedule: TweetSchedule = {
-      ...schedule,
+      ...scheduleData,
       id: `manual-${Date.now()}`,
+      lastRun: null
     };
     
     this.schedules.push(newSchedule);
@@ -236,5 +242,30 @@ export class DynamicAdjustmentsService {
     }
     
     return newSchedule;
+  }
+
+  deleteSchedule(id: string): { success: boolean } {
+    const initialLength = this.schedules.length;
+    this.schedules = this.schedules.filter(s => s.id !== id);
+    
+    // If a schedule was removed
+    if (initialLength !== this.schedules.length) {
+      this.saveSchedules();
+      
+      // Remove the cron job
+      try {
+        const jobName = `tweet-schedule-${id}`;
+        if (this.schedulerRegistry.getCronJobs().has(jobName)) {
+          this.schedulerRegistry.deleteCronJob(jobName);
+          this.logger.log(`Deleted cron job ${jobName}`);
+        }
+      } catch (error) {
+        this.logger.error(`Error deleting cron job: ${error.message}`);
+      }
+      
+      return { success: true };
+    }
+    
+    return { success: false };
   }
 } 

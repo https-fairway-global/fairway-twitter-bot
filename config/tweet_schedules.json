@@ -1,9 +1,30 @@
 [
   {
-    "id": "default",
-    "cronExpression": "0 */2 * * *",
+    "id": "optimized-1",
+    "cronExpression": "0 15 * * *",
+    "topicPreference": "Unknown",
+    "active": true,
+    "lastRun": null
+  },
+  {
+    "id": "optimized-2",
+    "cronExpression": "0 16 * * *",
+    "topicPreference": "Unknown",
+    "active": true,
+    "lastRun": null
+  },
+  {
+    "id": "optimized-3",
+    "cronExpression": "0 21 * * *",
+    "topicPreference": "Unknown",
+    "active": true,
+    "lastRun": null
+  },
+  {
+    "id": "exploration",
+    "cronExpression": "0 14 * * *",
     "topicPreference": "random",
     "active": true,
-    "lastRun": "2025-03-04T18:00:00.055Z"
+    "lastRun": null
   }
 ]

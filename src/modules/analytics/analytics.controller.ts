@@ -1,8 +1,10 @@
-import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
+import { Controller, Get, Post, Param, ParseIntPipe, Query, Logger } from '@nestjs/common';
 import { AnalyticsService } from './analytics.service';
 
-@Controller('analytics')
+@Controller('api/analytics')
 export class AnalyticsController {
+  private readonly logger = new Logger(AnalyticsController.name);
+  
   constructor(private readonly analyticsService: AnalyticsService) {}
 
   @Get('performance-by-topic')
@@ -25,9 +27,42 @@ export class AnalyticsController {
     return this.analyticsService.getBestPostingTimes();
   }
 
-  @Get('trigger-collection')
-  async triggerMetricsCollection() {
-    await this.analyticsService.collectMetrics();
-    return { message: 'Metrics collection triggered successfully' };
+  @Post('collect')
+  async collectMetrics() {
+    try {
+      this.logger.log('Manually triggering metrics collection...');
+      await this.analyticsService.forceCollectWithBackoff();
+      this.logger.log('Metrics collection process completed');
+      return { 
+        success: true,
+        message: 'Metrics collection initiated successfully' 
+      };
+    } catch (error) {
+      this.logger.error(`Metrics collection failed: ${error.message}`);
+      return { 
+        success: false, 
+        error: error.message 
+      };
+    }
+  }
+
+  @Post('collect-with-backoff')
+  async collectMetricsWithBackoff() {
+    try {
+      this.logger.log('Manually triggering metrics collection with backoff handling...');
+      await this.analyticsService.forceCollectWithBackoff();
+      this.logger.log('Metrics collection with backoff completed successfully');
+      return { 
+        success: true, 
+        message: 'Metrics collection with backoff completed successfully' 
+      };
+    } catch (error) {
+      this.logger.error(`Metrics collection with backoff failed: ${error.message}`);
+      return { 
+        success: false, 
+        error: error.message,
+        message: 'Metrics collection failed - see logs for details'
+      };
+    }
   }
 } 

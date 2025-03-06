@@ -6,6 +6,7 @@ A sophisticated Twitter bot designed to promote Fairway's blockchain identity ve
 
 - **Intelligent Content Strategy**: Creates engaging content focused on Cardano, blockchain identity, compliance, and related topics
 - **Smart Engagement System**: Automatically finds and engages with relevant conversations using prioritized hashtags and keywords
+- **Strategic Following**: Discovers and follows relevant accounts based on customizable criteria including follower count, bio keywords, and activity levels
 - **Balanced Promotion**: Maintains a 50/50 split between promotional and non-promotional content
 - **Voice & Tone**: Confident, witty, slightly irreverent tone that challenges outdated systems
 - **API Efficiency**: Automatically respects Twitter API rate limits for free tier users
@@ -102,3 +103,29 @@ This project is licensed under the [MIT License](LICENSE).
 ## Contact
 
 If you have any questions, suggestions, or feedback, feel free to reach out to me at [anthony@nwobodo.me].
+
+## Environment Variables
+
+### Twitter API Configuration
+
+- `TWITTER_API_KEY`: Your Twitter API key
+- `TWITTER_API_SECRET`: Your Twitter API secret
+- `TWITTER_ACCESS_TOKEN`: Your Twitter access token
+- `TWITTER_ACCESS_SECRET`: Your Twitter access token secret
+- `TWITTER_USER_ID`: Your Twitter user ID for API v2
+
+### Auto-Follow Configuration
+
+- `TWITTER_AUTO_FOLLOW_ENABLED`: Set to 'true' to enable automatic following (default: false)
+- `TWITTER_FOLLOW_KEYWORDS`: Comma-separated list of keywords to search for users to follow (default: "programming,javascript,tech")
+- `TWITTER_MAX_FOLLOWS_PER_DAY`: Maximum number of users to follow per day (default: 2)
+- `TWITTER_FOLLOW_MIN_FOLLOWERS`: Minimum follower count for accounts to follow (default: 100)
+- `TWITTER_FOLLOW_MAX_FOLLOWERS`: Maximum follower count for accounts to follow (default: 100000)
+- `TWITTER_FOLLOW_MIN_FOLLOWING`: Minimum following count for accounts to follow (default: 10)
+- `TWITTER_FOLLOW_MAX_FOLLOWING`: Maximum following count for accounts to follow (default: 5000)
+- `TWITTER_FOLLOW_MIN_TWEETS`: Minimum tweet count for accounts to follow (default: 50)
+- `TWITTER_FOLLOW_MUST_BE_VERIFIED`: Set to 'true' to only follow verified accounts (default: false)
+- `TWITTER_FOLLOW_MUST_HAVE_PICTURE`: Set to 'true' to only follow accounts with profile pictures (default: true)
+- `TWITTER_FOLLOW_MUST_HAVE_BIO`: Set to 'true' to only follow accounts with bios (default: true)
+- `TWITTER_FOLLOW_MIN_ACCOUNT_AGE`: Minimum account age in days (default: 30)
+- `TWITTER_FOLLOW_BIO_KEYWORDS`: Comma-separated list of keywords that must appear in user bios (optional)

@@ -1,28 +1,37 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
 import { DynamicAdjustmentsService } from './dynamic-adjustments.service';
 
-@Controller('dynamic-adjustments')
+@Controller('api/schedules')
 export class DynamicAdjustmentsController {
   constructor(private readonly dynamicAdjustmentsService: DynamicAdjustmentsService) {}
 
-  @Get('schedules')
+  @Get()
   getSchedules() {
     return this.dynamicAdjustmentsService.getSchedules();
   }
 
-  @Put('schedules/:id')
-  updateSchedule(@Param('id') id: string, @Body() updates: any) {
-    return this.dynamicAdjustmentsService.updateSchedule(id, updates);
+  @Get(':id')
+  getScheduleById(@Param('id') id: string) {
+    return this.dynamicAdjustmentsService.getScheduleById(id);
   }
 
-  @Post('schedules')
-  addSchedule(@Body() schedule: any) {
-    return this.dynamicAdjustmentsService.addSchedule(schedule);
+  @Post()
+  createSchedule(@Body() scheduleData: any) {
+    return this.dynamicAdjustmentsService.createSchedule(scheduleData);
   }
 
-  @Get('optimize')
-  async optimizeSchedules() {
-    await this.dynamicAdjustmentsService.optimizeSchedules();
-    return { message: 'Schedule optimization completed' };
+  @Put()
+  updateSchedule(@Body() scheduleData: any) {
+    return this.dynamicAdjustmentsService.updateSchedule(scheduleData);
+  }
+
+  @Delete(':id')
+  deleteSchedule(@Param('id') id: string) {
+    return this.dynamicAdjustmentsService.deleteSchedule(id);
+  }
+
+  @Post('optimize')
+  optimizeSchedules() {
+    return this.dynamicAdjustmentsService.optimizeSchedules();
   }
 } 
