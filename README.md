@@ -1,6 +1,6 @@
 # Fairway Twitter Bot
 
-A sophisticated Twitter bot designed to promote Fairway's blockchain identity verification solutions on Cardano and other chains. Leveraging advanced AI, it delivers engaging content about decentralized identity, compliance, Web3 hiring, and blockchain technology.
+A sophisticated Twitter bot designed to promote Fairway's blockchain identity verification solutions on Cardano and other chains. Leveraging advanced AI, it delivers engaging content about decentralized identity, compliance, Web3 hiring, and blockchain technology with a "panicked AI intern" personality inspired by Glootie from Rick and Morty.
 
 ## Key Features
 
@@ -100,6 +100,18 @@ To customize the content strategy:
 1. Modify the prompts in `src/constants/topic-prompts.constant.ts`
 2. Adjust topic weights in `src/modules/manage-tweet/manage-tweet.service.ts`
 3. Update hashtags and keywords in `src/constants/hashtags.constant.ts`
+4. Adjust the bot's tone in `docs/tone-guide.md`
+
+## Bot Personality & Tone
+
+The bot uses a unique "panicked intern" personality inspired by Glootie from Rick and Morty. This distinctive voice:
+
+- Makes the bot stand out from corporate accounts
+- Creates more engaging and memorable content
+- Fits with the bot's mission of challenging outdated systems
+- Balances humor with substantive blockchain knowledge
+
+For detailed guidance on the bot's tone and personality, see the [Tone Guide](docs/tone-guide.md).
 
 ## Troubleshooting
 

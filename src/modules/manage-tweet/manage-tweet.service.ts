@@ -639,8 +639,17 @@ export class ManageTweetService {
     // Get a weighted random topic
     const topic = this.getWeightedRandomTopic(relevantTopics);
     
-    // Generate content with more analytical tone
-    const prompt = `Generate an insightful tweet about ${topic.topic} that discusses current trends, challenges, or regulatory developments. Include a thoughtful perspective that positions Fairway as an industry expert. The tweet should be informative and slightly provocative to encourage engagement.`;
+    // Generate content with Glootie-style intern personality
+    const prompt = `Generate an insightful tweet about ${topic.topic} as if you're a slightly panicked but knowledgeable intern at Fairway.
+    
+    Use the Glootie-inspired personality where you:
+    1. Start with something like "Do not develop [a problematic solution]..." but then explain a better way
+    2. OR use phrases like "I'm just an intern, but..." followed by surprisingly insightful analysis
+    3. OR include "The mothership is coming!" when discussing regulations or compliance issues
+    
+    Despite your overwhelmed tone, include genuinely thoughtful perspective on current trends, challenges, or regulatory developments in ${topic.topic}.
+    
+    Make it slightly provocative but still professional enough that industry experts would appreciate the insight.`;
     
     const generatedContent = await this.openAiService.generateResponse({
       topic: topic.topic,
@@ -737,10 +746,13 @@ export class ManageTweetService {
         imagePath = this.localImageService.createMockImage(imagePrompt);
       }
       
-      // Generate enhanced tweet text
+      // Generate enhanced tweet text with Glootie personality for Fairway-focused content
       const tweetText = await this.openAiService.generateResponse({
         topic: 'Fairway Technology',
-        prompt: `Write a professional tweet highlighting Fairway's ${keywordPrompt}. Focus on benefits for blockchain identity solutions, enhanced security, or user privacy. Include a clear value proposition and 2-3 relevant hashtags. Max 240 characters. This will accompany a branded image, so focus on compelling text.`,
+        prompt: `Write a tweet highlighting Fairway's ${keywordPrompt} with a "panicked intern" Glootie-style personality. 
+        Include a warning like "Do not develop..." but then explain the benefits anyway. 
+        Focus on explaining how Fairway's technology is better than existing solutions for blockchain identity, enhanced security, or user privacy.
+        Include 1-2 relevant hashtags. This will accompany a branded image.`,
         userProfession: 'blockchain identity expert'
       });
       
@@ -791,8 +803,11 @@ export class ManageTweetService {
   async createEngagementTweet(): Promise<boolean> {
     this.logger.debug('Creating Engagement Tweet...');
     
-    // Generate witty, engaging content
-    const prompt = `Generate a witty, engaging tweet that would appeal to the crypto and blockchain community. It should be slightly provocative, humorous, or use a meme format that encourages engagement. The tone should match the 'fun' side of Fairway's brand voice - confident, witty, and slightly irreverent.`;
+    // Generate witty, engaging content with Glootie personality
+    const prompt = `Generate a witty, engaging tweet with a "panicked intern" Glootie-style personality.
+    This should be slightly provocative or use memes that crypto and blockchain folks would enjoy.
+    Occasionally include lines like "I'm just an intern" or "The mothership is coming" (when discussing regulations).
+    Make it fun, slightly chaotic, but still insightful about crypto, blockchain, or digital identity.`;
     
     const generatedContent = await this.openAiService.generateResponse({
       topic: 'Tweet Engagement',
@@ -907,14 +922,14 @@ export class ManageTweetService {
     
     switch (engagementType) {
       case 'fairway':
-        prompt = `Generate a reply to this tweet that offers insights on why existing solutions are broken and explains how Fairway improves them. Use memes or analogies to make technical topics accessible. The tweet says: "${tweetText}"`;
+        prompt = `Generate a Glootie-style intern reply to this tweet that offers insights on why existing solutions are broken and explains how Fairway improves them. Include a warning like "Do not develop my app!" or "I'm just an intern!" somewhere. The tweet says: "${tweetText}"`;
         break;
       case 'parody':
-        prompt = `Generate a reply to this tweet that frames it as parody instead of taking a strong stance. Relate it to Web3 regulation, financial freedom, or bureaucracy. Stick to sarcasm & satire, never get combative. The tweet says: "${tweetText}"`;
+        prompt = `Generate a panicked intern reply to this tweet that frames it as parody. Use the phrase "The mothership is coming!" somewhere and relate it to crypto regulation or bureaucracy. Be chaotic but still knowledgeable. The tweet says: "${tweetText}"`;
         break;
       case 'fun':
       default:
-        prompt = `Generate a witty reply to this tweet that adds a comment, meme, or joke. Keep it organic & engaging and avoid overexplaining. The tweet says: "${tweetText}"`;
+        prompt = `Generate a reply as if you're a slightly overwhelmed AI intern. Make a joke or share an "AI intern struggle" while still being witty. Include a Glootie-style phrase like "I'm just an intern!" or "This is not how making things work works." The tweet says: "${tweetText}"`;
         break;
     }
     
