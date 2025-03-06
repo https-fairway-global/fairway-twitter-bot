@@ -20,6 +20,7 @@ function setupButtonHandlers() {
   const triggerTweetBtn = document.getElementById('triggerTweet');
   const collectMetricsBtn = document.getElementById('collectMetrics');
   const checkMentionsBtn = document.getElementById('checkMentions');
+  const triggerAutoFollowBtn = document.getElementById('triggerAutoFollow');
   
   // Add event listeners if elements exist
   if (optimizeSchedulesBtn) {
@@ -44,6 +45,10 @@ function setupButtonHandlers() {
   
   if (checkMentionsBtn) {
     checkMentionsBtn.addEventListener('click', checkMentionsNow);
+  }
+  
+  if (triggerAutoFollowBtn) {
+    triggerAutoFollowBtn.addEventListener('click', runAutoFollowNow);
   }
 }
 
@@ -211,6 +216,23 @@ function checkMentionsNow() {
   .catch(error => {
     console.error('Error checking mentions:', error);
     alert('Failed to check mentions. Check console for details.');
+  });
+}
+
+function runAutoFollowNow() {
+  console.log('Running auto-follow now...');
+  
+  // Call API endpoint
+  fetch('/api/tweet/auto-follow', {
+    method: 'POST',
+  })
+  .then(response => response.json())
+  .then(data => {
+    alert('Auto-follow process completed! ' + (data.message || ''));
+  })
+  .catch(error => {
+    console.error('Error running auto-follow:', error);
+    alert('Failed to run auto-follow. Check console for details.');
   });
 }
 

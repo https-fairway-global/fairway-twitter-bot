@@ -260,7 +260,25 @@ export class ManageTweetController {
 
   @Post('collect-metrics')
   async collectMetrics() {
-    return this.manageTweetService.collectMetrics();
+    const result = await this.manageTweetService.collectMetrics();
+    return result;
+  }
+
+  @Post('auto-follow')
+  async triggerAutoFollow() {
+    try {
+      await this.manageTweetService.scheduleAutoFollow();
+      return {
+        success: true,
+        message: 'Auto-follow process started successfully'
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: `Failed to run auto-follow: ${error.message}`,
+        error: error.message
+      };
+    }
   }
 
   @Get('twitter-user-id')
