@@ -42,6 +42,18 @@ The bot focuses on key areas relevant to Fairway's mission:
 7. **Ethiopia & Emerging Markets** - Blockchain adoption and financial inclusion in emerging markets
 8. **Legacy System Critique** - Highlighting inefficiencies in traditional identity and financial systems
 
+## Engagement Rules
+
+The bot follows specific rules when engaging with tweets:
+
+1. **Minimum Likes Threshold**: Only engages with tweets that have at least 10 likes to ensure quality interactions
+2. **Engagement Types**:
+   - **Fun**: Generates witty replies with memes or jokes while keeping it organic
+   - **Fairway**: Offers insights on existing solution problems and Fairway's improvements
+   - **Parody**: Creates satirical responses related to Web3 regulation and bureaucracy
+3. **Rate Limiting**: Respects Twitter API rate limits and includes exponential backoff
+4. **Error Handling**: Gracefully handles API errors and provides clear feedback
+
 ## Getting Started
 
 To get started with the Fairway Twitter Bot, follow these steps:

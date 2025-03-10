@@ -2,9 +2,12 @@ import { Controller, Post, Body, Get, Param, Query } from '@nestjs/common';
 import { ManageTweetService } from './manage-tweet.service';
 import { TwitterApiService } from '../api-integrations/twitterApi.service';
 import { CONTENT_TYPES, POST_CONTENT_RATIO } from '../../constants/content-strategy.constant';
+import { Logger } from '@nestjs/common';
 
 @Controller('api/tweet')
 export class ManageTweetController {
+  private readonly logger = new Logger(ManageTweetController.name);
+
   constructor(
     private readonly manageTweetService: ManageTweetService,
     private readonly twitterApiService: TwitterApiService
@@ -210,6 +213,22 @@ export class ManageTweetController {
       
       if (!tweet) {
         return { success: false, message: 'Tweet not found' };
+      }
+      
+      // Log tweet structure to debug
+      this.logger.debug(`Tweet structure: ${JSON.stringify(tweet)}`);
+      
+      // Check if tweet has at least 10 likes
+      const likeCount = tweet.public_metrics?.like_count || 0;
+      this.logger.debug(`Tweet ${body.tweetId} has ${likeCount} likes`);
+      
+      if (likeCount < 10) {
+        this.logger.warn(`Not engaging with tweet ${body.tweetId} because it has fewer than 10 likes (${likeCount})`);
+        return {
+          success: false,
+          message: `Tweet does not meet minimum engagement criteria (${likeCount} likes, minimum 10 required)`,
+          tweetId: body.tweetId
+        };
       }
       
       // Determine engagement type
